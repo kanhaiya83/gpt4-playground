@@ -3,6 +3,7 @@ import { OpenAIChatMessage } from "@/utils/OpenAI";
 import React from "react";
 import { MdOutlineCancel } from "react-icons/md";
 import { usePlayground } from "@/context/PlaygroundProvider";
+import AssistantMessageContent from "../chat/AssistantMessageContent";
 
 type Props = {
   message: OpenAIChatMessage;
@@ -75,13 +76,13 @@ export default function PlaygroundMessage({
         </button>
       </div>
       <div className="basis-8/12 items-center">
-        <textarea
+        {role=="user"?<textarea
           className="text-md w-full resize-none rounded bg-transparent p-4 text-gray-700 focus:border-transparent focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-600"
           value={content}
           onChange={handleContentChange}
           placeholder={`Enter ${role} message here`}
           ref={textAreaRef}
-        />
+        />:<AssistantMessageContent content={content}/>}
       </div>
 
       <div className="flex basis-1/12 justify-center">
