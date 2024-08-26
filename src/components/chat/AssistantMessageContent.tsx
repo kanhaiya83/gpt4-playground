@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rangeParser from "parse-numeric-range";
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
@@ -26,7 +26,6 @@ SyntaxHighlighter.registerLanguage("markdown", markdown);
 SyntaxHighlighter.registerLanguage("python", python);
 SyntaxHighlighter.registerLanguage("cpp", cpp);
 SyntaxHighlighter.registerLanguage("json", json);
-SyntaxHighlighter.registerLanguage("json", json);
 
 const syntaxTheme = oneDark;
 
@@ -34,9 +33,25 @@ type Props = {
   content: string;
 };
 
+const CopyButton = ({ code }: { code: string }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  return (
+    <button onClick={handleCopy} style={{ position: "absolute", right: "10px", top: "10px" }}>
+      {copied ? "Copied!" : "Copy"}
+    </button>
+  );
+};
+
 export default function AssistantMessageContent({ content, ...props }: Props) {
   const MarkdownComponents: any = {
-    // Work around for not rending <em> and <strong> tags
     em: ({ node, inline, className, children, ...props }: any) => {
       return (
         <span className={className} {...props}>
@@ -86,18 +101,21 @@ export default function AssistantMessageContent({ content, ...props }: Props) {
       };
 
       return hasLang ? (
-        <SyntaxHighlighter
-          style={syntaxTheme}
-          language={hasLang[1]}
-          PreTag="div"
-          className="overflow-hidden rounded-md"
-          showLineNumbers={true}
-          wrapLines={hasMeta}
-          useInlineStyles={true}
-          lineProps={applyHighlights}
-        >
-          {props.children}
-        </SyntaxHighlighter>
+        <div style={{ position: "relative" }}>
+          <CopyButton code={String(props.children).trim()} />
+          <SyntaxHighlighter
+            style={syntaxTheme}
+            language={hasLang[1]}
+            PreTag="div"
+            className="overflow-hidden rounded-md"
+            showLineNumbers={true}
+            wrapLines={hasMeta}
+            useInlineStyles={true}
+            lineProps={applyHighlights}
+          >
+            {props.children}
+          </SyntaxHighlighter>
+        </div>
       ) : (
         <code className={className} {...props} />
       );
