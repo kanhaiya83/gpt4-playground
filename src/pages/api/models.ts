@@ -6,7 +6,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const apiKey = (req.headers["authorization"] as string)?.split(" ")[1];
+  const apiKey = (process.env.OPENAI_TOKEN as string)
   if (!apiKey) {
     return res.status(401).json({ error: "Missing token" });
   }
